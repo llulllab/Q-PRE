@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Editor — Dashboard</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:960px;margin:40px auto;padding:0 16px;line-height:1.5}
+    table{border-collapse:collapse;width:100%}
+    th,td{border:1px solid #e2e2e2;padding:8px;text-align:left}
+    th{background:#f8f8f8}
+    .muted{color:#666;font-size:.9rem}
+  </style>
+</head>
+<body>
+  <div id="topbar" style="display:flex;justify-content:space-between;align-items:center;background:#f6f6f6;border:1px solid #e2e2e2;border-radius:10px;padding:8px 12px;margin:8px 0;">
+    <span id="whoami" style="font-size:.9rem;color:#444">Signed in</span>
+    <button id="signOut" style="padding:6px 10px;border-radius:8px;border:1px solid #333;background:#111;color:#fff;cursor:pointer">Sign out</button>
+  </div>
+
+  <h2>Editor — Dashboard</h2>
+  <p class="muted">You can see all submissions metadata (author uploads). Files are in Storage; open by path in the console for now.</p>
+  <table id="tbl">
+    <thead><tr><th>Created</th><th>Title</th><th>Owner</th><th>Status</th><th>Keywords</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p><a href="./index.html">↩ Back</a></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    /* Paste your Firebase web config here */
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "q-pre-2c2d2.firebaseapp.com",
+      projectId: "q-pre-2c2d2",
+      storageBucket: "q-pre-2c2d2.firebasestorage.app",
+      messagingSenderId: "553970542224",
+      appId: "1:553970542224:web:a915f9f613a3816be9da15"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const who = document.getElementById("whoami");
+    const btnOut = document.getElementById("signOut");
+    const tbody = document.querySelector("#tbl tbody");
+
+    // Kullanıcıyı izle: giriş yoksa index'e, varsa rolü kontrol et
+    onAuthStateChanged(auth, async (u) => {
+      if (!u) {
+        window.location.href = "./index.html";
+        return;
+      }
+      who.textContent = u.email || "Signed in";
+
+      // Rol kontrolü: yalnızca editor erişsin
+      try {
+        const roleDoc = await getDoc(doc(db, "rolesByEmail", u.email));
+        const role = roleDoc.exists() ? roleDoc.data().role : null;
+        if (role !== "editor") {
+          // editor değilse ana sayfaya gönder
+          window.location.href = "./index.html";
+          return;
+        }
+      } catch (e) {
+        console.error("Role check failed:", e);
+        window.location.href = "./index.html";
+        return;
+      }
+
+      // Sign out
+      btnOut.onclick = async () => {
+        await signOut(auth);
+        window.location.href = "./index.html";
+      };
+
+      // Editör: submissions listesini canlı izle
+      const qy = query(collection(db, "submissions"), orderBy("createdAt", "desc"));
+      onSnapshot(qy, (snap) => {
+        tbody.innerHTML = "";
+        snap.forEach(docu => {
+          const d = docu.data();
+          const created = d.createdAt?.toDate ? d.createdAt.toDate().toISOString().split("T")[0] : "";
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${created}</td><td>${d.title||""}</td><td>${d.ownerEmail||""}</td><td>${d.status||""}</td><td>${(d.keywords||[]).join(", ")}</td>`;
+          tbody.appendChild(tr);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
