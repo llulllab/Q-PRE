@@ -3,68 +3,187 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Q-PRE Portal</title>
+  <title>Q-PRE — Journal Portal</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Spectral&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    :root {
+      --bg: #123524;     /* Phthalo Green */
+      --fg: #ffffff;     /* White text */
+      --fg-muted: #cccccc;
+      --border: #ffffff;
+      --btn-border: #0d2519; /* darker phthalo */
+    }
+
+    /* Base layout — mirrored from Llull Lab home (except colors) */
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      max-width: 760px;
-      margin: 40px auto;
-      padding: 0 16px;
-      line-height: 1.5;
-      background-color: #123524; /* Phthalo Green */
-      color: #fff; /* metin beyaz */
+      animation: fadeIn 2s ease-in-out;
+      background-color: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      font-family: 'Spectral', serif;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 16px 60px 16px; /* top and bottom breathing room */
     }
-    header h1 {margin:0 0 8px 0}
+
+    header {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      letter-spacing: .2px;
+    }
+
+    .tagline {
+      margin: 0 0 26px 0;
+      font-family: 'Spectral', serif;
+      font-size: 1.05rem;
+      line-height: 1.4;
+    }
+
+    /* Navigation — same structure/feel as Llull Lab */
+    .nav-links {
+      display: flex;
+      flex-direction: row;
+      gap: 15px;
+      margin-top: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .nav-links a {
+      color: var(--fg);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 4px;
+      transition: background-color 0.3s, color 0.3s, transform 0.3s;
+    }
+
+    .nav-links a:hover {
+      background-color: var(--fg);
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    /* Card mirrors white panel while page stays dark */
     .card {
-      border: 1px solid #ddd;
+      border: 1px solid rgba(255,255,255,0.25);
       border-radius: 12px;
-      padding: 16px;
-      background: #fff;   /* kart beyaz */
-      color: #000;        /* kart içindeki metin siyah */
+      padding: 18px;
+      background: #fff;
+      color: #000;
+      max-width: 760px;
+      width: 100%;
+      text-align: left;
     }
+
+    /* Buttons styled to match link feel but as filled on dark bg */
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
     button {
       padding: 10px 14px;
       border-radius: 10px;
-      border: 1px solid #0d2519; /* koyu phthalo yeşil */
-      background: #123524;       /* Phthalo Green */
-      color: #fff;
+      border: 1px solid var(--btn-border);
+      background: var(--bg);
+      color: var(--fg);
       cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      transition: filter .2s ease, transform .2s ease;
     }
+
+    button:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
     button:disabled {
       opacity: .6;
       cursor: not-allowed;
     }
+
     #signOut {
       background: #666;
       border-color: #666;
     }
+
     .muted {
-      color: #ccc; /* gri-beyaz */
-      font-size: .9rem;
+      color: var(--fg-muted);
+      font-size: .95rem;
+      margin-top: 8px;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-family: 'Spectral', serif;
+    }
+
+    footer a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(255,255,255,0.6);
     }
   </style>
 </head>
 <body>
+
   <header>
-    <h1>Q-PRE — Journal Portal </h1>
-    Q Reports – Peer-Reviewed Edition: Journal of Combinatorial Practices
-    <p class="muted">Sign in with Google, then you'll be routed to your panel (Author / Reviewer / Editor).</p>
+    <h1>Q-PRE — Journal Portal</h1>
+    <p class="tagline">Q Reports – Peer-Reviewed Edition: Journal of Combinatorial Practices</p>
+
+    <nav class="nav-links" aria-label="Primary">
+      <a href="./about.html">About the Journal</a>
+      <a href="./editorial-team.html">Editorial Team</a>
+      <a href="./archives.html">Archives</a>
+    </nav>
+
+    <p class="muted">Sign in with Google to access your panel (Author / Reviewer / Editor).</p>
   </header>
 
-  <div class="card">
-    <p id="status">Not signed in.</p>
-    <button id="googleSignIn">Sign in with Google</button>
-    <button id="signOut" style="display:none;">Sign out</button>
+  <div class="card" role="region" aria-labelledby="authPanelTitle">
+    <h2 id="authPanelTitle" style="margin:0 0 8px 0;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1.1rem;">
+      Access
+    </h2>
+    <p id="status" style="margin:0 0 10px 0;">Not signed in.</p>
+    <div class="actions">
+      <button id="googleSignIn" aria-label="Sign in with Google">Sign in with Google</button>
+      <button id="signOut" style="display:none;" aria-label="Sign out">Sign out</button>
+    </div>
+    <p class="muted">After sign-in, you will be redirected depending on your role.</p>
   </div>
 
-  <p class="muted">After sign-in, you will be redirected depending on your role.</p>
+  <footer>
+    <p class="muted">Contact: <a href="mailto:contact@llulllab.com">contact@llulllab.com</a></p>
+  </footer>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    /* Paste your Firebase web config here */
+    /* Firebase web config */
     const firebaseConfig = {
       apiKey: "AIzaSyAaxb_8mpkTLVdCZeAGmTMMvr8ppIzc0Y0",
       authDomain: "q-pre-2c2d2.firebaseapp.com",
